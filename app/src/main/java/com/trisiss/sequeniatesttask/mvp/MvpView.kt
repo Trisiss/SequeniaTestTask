@@ -1,4 +1,4 @@
-package com.trisiss.sequeniatesttask
+package com.trisiss.sequeniatesttask.mvp
 
 /**
  * Created by trisiss on 8/4/2021.

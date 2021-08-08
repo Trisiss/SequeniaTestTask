@@ -2,10 +2,10 @@ package com.trisiss.sequeniatesttask.listFilms
 
 import android.os.Bundle
 import android.util.Log
+import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.FilmsService
 import com.trisiss.sequeniatesttask.data.model.FilmDto
 import com.trisiss.sequeniatesttask.data.model.FilmsDto
-import com.trisiss.sequeniatesttask.mvp.PresenterBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,10 +15,10 @@ import retrofit2.Response
 /**
  * Created by trisiss on 8/5/2021.
  */
-class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsContract.Presenter,
-    PresenterBase<ListFilmsContract.View>() {
+class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsContract.Presenter {
 
-    var listFilm: ArrayList<FilmDto>? = arrayListOf<FilmDto>()
+    var view: ListFilmsContract.View? = null
+    var listFilm: ArrayList<FilmDto> = arrayListOf<FilmDto>()
     var response: Response<FilmsDto>? = null
 
     override fun load() {
@@ -27,13 +27,32 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
             response = filmsService.load()
             withContext(Dispatchers.Main) {
                 if (response!!.isSuccessful)
-                    Log.e("Load", "load: ${response!!.body()?.films?.get(1)}")
+                   view?.changeState(StateView.COMPLETE)
             }
         }
     }
 
+    fun isViewAttached(): Boolean {
+        return view != null
+    }
+
+    override fun attachView(mvpView: ListFilmsContract.View) {
+        view = mvpView
+    }
+
+    override fun detachView() {
+        view = null
+    }
+
+    override fun destroy() {
+
+    }
+
+    override fun getFilmList() = listFilm
+
     override fun loadFromState(state: Bundle) {
-        listFilm = state.getParcelableArrayList("listFilms")
+        listFilm = state.getParcelableArrayList("listFilms") ?: arrayListOf()
+        view?.changeState(StateView.COMPLETE)
     }
 
 

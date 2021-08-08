@@ -19,4 +19,4 @@ data class FilmDto(
     @field:Json(name = "image_url") val imageUrl: String?,
     @field:Json(name = "description") val description: String?,
     @field:Json(name = "genres") val genres: List<String>
-): Parcelable, FilmListItem
+): Parcelable, FilmListItem()

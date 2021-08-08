@@ -7,6 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.trisiss.sequeniatesttask.StateView
+import com.trisiss.sequeniatesttask.data.model.FilmDto
+import com.trisiss.sequeniatesttask.data.model.FilmListItem
+import com.trisiss.sequeniatesttask.data.model.GenreDto
+import com.trisiss.sequeniatesttask.data.model.HeaderItem
 import com.trisiss.sequeniatesttask.databinding.FragmentListFilmsBinding
 import org.koin.android.ext.android.inject
 
@@ -24,6 +28,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
     private val presenter: ListFilmsContract.Presenter by inject()
     private lateinit var binding: FragmentListFilmsBinding
+    private val listFilmsAdapter = ListFilmsAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +40,6 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
         binding = FragmentListFilmsBinding.inflate(layoutInflater, container, false)
 
         val gridLayoutManager = GridLayoutManager(context, 2)
-        val listFilmsAdapter = ListFilmsAdapter()
 
         binding.recyclerListFilms.apply {
             layoutManager = gridLayoutManager
@@ -54,7 +58,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
         presenter.load()
     }
 
-    fun changeState(state: StateView) {
+    override fun changeState(state: StateView) {
         when (state) {
             StateView.LOADING -> {
 
@@ -63,9 +67,27 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
             }
             StateView.COMPLETE -> {
-
+                val listFilm = presenter.getFilmList()
+                val genres = getGenres(listFilm)
+                val data = arrayListOf<FilmListItem>()
+                data.add(HeaderItem(title = "Жанры"))
+                data.addAll(genres)
+                data.add(HeaderItem(title = "Фильмы"))
+                data.addAll(listFilm)
+                listFilmsAdapter.setNewData(newData = data)
             }
         }
+    }
+
+    private fun getGenres(listFilm: ArrayList<FilmDto>): ArrayList<GenreDto> {
+        val genres = arrayListOf<GenreDto>()
+        listFilm.forEach { filmDto ->
+            filmDto.genres.forEach { genre ->
+                val genreDto = GenreDto(genre)
+                if (!genres.contains(genreDto)) genres.add(genreDto)
+            }
+        }
+        return genres
     }
 
     override fun onDestroy() {
@@ -75,8 +97,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val adapter = binding.recyclerListFilms.adapter as ListFilmsAdapter
-        outState.putParcelableArrayList("listFilm", adapter.dataList)
+        outState.putParcelableArrayList("listFilm", presenter.getFilmList())
     }
 
     companion object {

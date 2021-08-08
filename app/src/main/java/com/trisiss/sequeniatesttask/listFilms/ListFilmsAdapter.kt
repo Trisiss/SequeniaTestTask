@@ -22,7 +22,7 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     fun setNewData(newData: ArrayList<FilmListItem>) {
         dataList.clear()
         dataList.addAll(newData)
-        notifyItemRangeInserted(0, dataList.size)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -43,9 +43,9 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return when (dataList[position]) {
-            is FilmDto -> FilmListItem.FILM
             is HeaderItem -> FilmListItem.HEADER
             is GenreDto -> FilmListItem.GENRE
+            else -> FilmListItem.FILM
         }
     }
 

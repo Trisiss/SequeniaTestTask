@@ -61,7 +61,8 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
     override fun changeState(state: StateView) {
         when (state) {
             StateView.LOADING -> {
-
+                binding.progressCircular.visibility = View.VISIBLE
+                binding.recyclerListFilms.visibility = View.GONE
             }
             StateView.ERROR -> {
 
@@ -75,6 +76,8 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
                 data.add(HeaderItem(title = "Фильмы"))
                 data.addAll(listFilm)
                 listFilmsAdapter.setNewData(newData = data)
+                binding.progressCircular.visibility = View.GONE
+                binding.recyclerListFilms.visibility = View.VISIBLE
             }
         }
     }

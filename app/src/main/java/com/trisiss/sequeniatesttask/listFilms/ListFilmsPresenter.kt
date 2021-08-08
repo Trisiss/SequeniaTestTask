@@ -22,12 +22,15 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
     var response: Response<FilmsDto>? = null
 
     override fun load() {
+        view?.changeState(StateView.LOADING)
         Log.e("CreatePresenter", "create: ${response ?: "Nothing"}")
         CoroutineScope(Dispatchers.IO).launch {
             response = filmsService.load()
             withContext(Dispatchers.Main) {
-                if (response!!.isSuccessful)
-                   view?.changeState(StateView.COMPLETE)
+                if (response!!.isSuccessful) {
+                    listFilm = ArrayList(response!!.body()?.films) ?: arrayListOf()
+                    view?.changeState(StateView.COMPLETE)
+                }
             }
         }
     }
@@ -51,6 +54,7 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
     override fun getFilmList() = listFilm
 
     override fun loadFromState(state: Bundle) {
+        view?.changeState(StateView.LOADING)
         listFilm = state.getParcelableArrayList("listFilms") ?: arrayListOf()
         view?.changeState(StateView.COMPLETE)
     }

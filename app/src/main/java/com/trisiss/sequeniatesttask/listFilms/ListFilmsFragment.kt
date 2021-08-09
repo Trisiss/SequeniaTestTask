@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.model.FilmDto
 import com.trisiss.sequeniatesttask.data.model.FilmListItem
@@ -32,14 +33,23 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_list_films, container, false)
-
+        presenter.attachView(mvpView = this)
         binding = FragmentListFilmsBinding.inflate(layoutInflater, container, false)
 
         val gridLayoutManager = GridLayoutManager(context, 2)
+        gridLayoutManager.spanSizeLookup = object : SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when(listFilmsAdapter.getItemViewType(position)) {
+                    FilmListItem.FILM -> 1
+                    else -> 2
+                }
+            }
+
+        }
 
         binding.recyclerListFilms.apply {
             layoutManager = gridLayoutManager
@@ -100,7 +110,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("listFilm", presenter.getFilmList())
+        outState.putParcelableArrayList("listFilms", presenter.getFilmList())
     }
 
     companion object {

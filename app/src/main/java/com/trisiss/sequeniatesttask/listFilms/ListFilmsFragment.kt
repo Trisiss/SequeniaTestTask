@@ -1,6 +1,7 @@
 package com.trisiss.sequeniatesttask.listFilms
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,6 @@ import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.model.FilmDto
 import com.trisiss.sequeniatesttask.data.model.FilmListItem
 import com.trisiss.sequeniatesttask.data.model.GenreDto
-import com.trisiss.sequeniatesttask.data.model.HeaderItem
 import com.trisiss.sequeniatesttask.databinding.FragmentListFilmsBinding
 import org.koin.android.ext.android.inject
 
@@ -51,6 +51,27 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
         }
 
+        listFilmsAdapter.attachDelegate(object: OnClickItem {
+            override fun filter(genre: GenreDto) {
+                Log.d("sdfd", "filter: ${genre.title}")
+                listFilmsAdapter.dataList.forEach { item ->
+                    when (item) {
+                        is GenreDto -> {
+                            item.activate = item == genre
+                        }
+                        is FilmDto -> {
+                            item.visible = item.genres.contains(genre.title)
+                        }
+                    }
+                }
+                listFilmsAdapter.notifyDataSetChanged()
+            }
+
+            override fun openFilm(film: FilmDto) {
+                TODO("Not yet implemented")
+            }
+        })
+
         binding.recyclerListFilms.apply {
             layoutManager = gridLayoutManager
             adapter = listFilmsAdapter
@@ -78,30 +99,13 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
             }
             StateView.COMPLETE -> {
-                val listFilm = presenter.getFilmList()
-                val genres = getGenres(listFilm)
-                val data = arrayListOf<FilmListItem>()
-                data.add(HeaderItem(title = "Жанры"))
-                data.addAll(genres)
-                data.add(HeaderItem(title = "Фильмы"))
-                data.addAll(listFilm)
-                listFilmsAdapter.setNewData(newData = data)
+                listFilmsAdapter.setNewData(newData = presenter.getFilmListUI())
                 binding.progressCircular.visibility = View.GONE
                 binding.recyclerListFilms.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun getGenres(listFilm: ArrayList<FilmDto>): ArrayList<GenreDto> {
-        val genres = arrayListOf<GenreDto>()
-        listFilm.forEach { filmDto ->
-            filmDto.genres.forEach { genre ->
-                val genreDto = GenreDto(genre)
-                if (!genres.contains(genreDto)) genres.add(genreDto)
-            }
-        }
-        return genres
-    }
 
     override fun onDestroy() {
         super.onDestroy()

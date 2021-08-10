@@ -6,12 +6,13 @@
 
     <TextView
         android:id="@+id/header_textview"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="24sp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:background="#5C9D9B9F"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

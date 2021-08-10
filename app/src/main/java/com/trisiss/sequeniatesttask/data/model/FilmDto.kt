@@ -18,5 +18,6 @@ data class FilmDto(
     @field:Json(name = "rating") val rating: Float?,
     @field:Json(name = "image_url") val imageUrl: String?,
     @field:Json(name = "description") val description: String?,
-    @field:Json(name = "genres") val genres: List<String>
+    @field:Json(name = "genres") val genres: List<String>,
+    var visible: Boolean = true
 ): Parcelable, FilmListItem()

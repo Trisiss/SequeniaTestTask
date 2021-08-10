@@ -1,6 +1,7 @@
 package com.trisiss.sequeniatesttask.listFilms
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.trisiss.sequeniatesttask.data.model.FilmDto
@@ -17,7 +18,7 @@ import com.trisiss.sequeniatesttask.loadImage
  */
 class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var dataList = arrayListOf<FilmListItem>()
-    var clickListener: OnClickItemFilm? = null
+    private var delegate: OnClickItem? = null
 
     fun setNewData(newData: ArrayList<FilmListItem>) {
         dataList.clear()
@@ -25,11 +26,15 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
+    fun attachDelegate(delegate: OnClickItem) {
+        this.delegate = delegate
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType) {
             FilmListItem.HEADER -> HeaderViewHolder(ListItemHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            FilmListItem.GENRE -> GenreViewHolder(ListItemGenreBinding.inflate(LayoutInflater.from(parent.context), parent, false), clickListener)
-            else -> FilmViewHolder(ListItemFilmBinding.inflate(LayoutInflater.from(parent.context), parent, false), clickListener)
+            FilmListItem.GENRE -> GenreViewHolder(ListItemGenreBinding.inflate(LayoutInflater.from(parent.context), parent, false), delegate)
+            else -> FilmViewHolder(ListItemFilmBinding.inflate(LayoutInflater.from(parent.context), parent, false), delegate)
         }
     }
 
@@ -51,26 +56,28 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount(): Int = dataList.size
 
-    class FilmViewHolder(val binding: ListItemFilmBinding, val clickItemFilm: OnClickItemFilm?) : RecyclerView.ViewHolder(binding.root) {
+    class FilmViewHolder(val binding: ListItemFilmBinding, val delegate: OnClickItem?) : RecyclerView.ViewHolder(binding.root) {
         fun bind(model: FilmDto){
             binding.apply {
                 previewImageview.loadImage(model.imageUrl)
                 previewTextview.text = model.localizedName
-                itemView.setOnClickListener {
-                    clickItemFilm?.openFilm(model)
+                previewImageview.setOnClickListener {
+                    delegate?.openFilm(model)
                 }
+                itemView.visibility = if (model.visible) View.VISIBLE else View.GONE
             }
         }
 
     }
 
-    class GenreViewHolder(val binding: ListItemGenreBinding, val clickItemFilm: OnClickItemFilm?) : RecyclerView.ViewHolder(binding.root) {
+    class GenreViewHolder(val binding: ListItemGenreBinding, val delegate: OnClickItem?) : RecyclerView.ViewHolder(binding.root) {
         fun bind(model: GenreDto){
             binding.apply {
                 genreButton.text = model.title
-                itemView.setOnClickListener {
-                    clickItemFilm?.filter(model)
+                genreButton.setOnClickListener {
+                    delegate?.filter(model)
                 }
+                genreButton.isActivated = model.activate
             }
         }
     }
@@ -84,7 +91,7 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 }
 
-interface OnClickItemFilm {
+interface OnClickItem {
     fun filter(genre: GenreDto)
     fun openFilm(film: FilmDto)
 }

@@ -1,15 +1,14 @@
 package com.trisiss.sequeniatesttask.listFilms
 
 import android.os.Bundle
-import android.util.Log
 import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.FilmsService
-import com.trisiss.sequeniatesttask.data.model.FilmDto
-import com.trisiss.sequeniatesttask.data.model.FilmsDto
+import com.trisiss.sequeniatesttask.data.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.IOException
 import retrofit2.Response
 
 /**
@@ -23,16 +22,52 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
 
     override fun load() {
         view?.changeState(StateView.LOADING)
-        Log.e("CreatePresenter", "create: ${response ?: "Nothing"}")
         CoroutineScope(Dispatchers.IO).launch {
             response = filmsService.load()
             withContext(Dispatchers.Main) {
                 if (response!!.isSuccessful) {
-                    listFilm = ArrayList(response!!.body()?.films) ?: arrayListOf()
-                    view?.changeState(StateView.COMPLETE)
+                    try {
+                        listFilm = ArrayList(response!!.body()?.films)
+                        view?.changeState(StateView.COMPLETE)
+                    } catch (e: IOException) {
+                        view?.changeState(StateView.ERROR)
+                    }
                 }
             }
         }
+    }
+
+    override fun getFilmList() = listFilm
+
+    override fun loadFromState(state: Bundle) {
+        view?.changeState(StateView.LOADING)
+        listFilm = state.getParcelableArrayList("listFilms") ?: arrayListOf()
+        view?.changeState(StateView.COMPLETE)
+    }
+
+    override fun getFilmListUI(): ArrayList<FilmListItem> {
+        val genres = getGenres(listFilm)
+        val data = arrayListOf<FilmListItem>()
+        data.add(HeaderItem(title = "Жанры"))
+        data.addAll(genres)
+        data.add(HeaderItem(title = "Фильмы"))
+        data.addAll(listFilm)
+        return data
+    }
+
+
+    private fun getGenres(listFilm: ArrayList<FilmDto>): ArrayList<GenreDto> {
+        val genres = arrayListOf<GenreDto>()
+        val genresString = arrayListOf<String>()
+        listFilm.forEach { filmDto ->
+            filmDto.genres.forEach { genre ->
+                if (!genresString.contains(genre)) {
+                    genres.add(GenreDto(title = genre))
+                    genresString.add(genre)
+                }
+            }
+        }
+        return genres
     }
 
     fun isViewAttached(): Boolean {
@@ -50,14 +85,4 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
     override fun destroy() {
 
     }
-
-    override fun getFilmList() = listFilm
-
-    override fun loadFromState(state: Bundle) {
-        view?.changeState(StateView.LOADING)
-        listFilm = state.getParcelableArrayList("listFilms") ?: arrayListOf()
-        view?.changeState(StateView.COMPLETE)
-    }
-
-
 }

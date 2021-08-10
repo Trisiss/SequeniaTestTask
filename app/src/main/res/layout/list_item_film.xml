@@ -3,17 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="5dp"
     xmlns:tool="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/preview_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_width="wrap_content"
+        android:layout_height="260dp"
+        android:contentDescription="Preview film"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Preview film" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/preview_textview"
@@ -24,7 +26,9 @@
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="#6B403F42"
+        android:background="#AB403F42"
+        android:textColor="@color/white"
+        android:textSize="17sp"
         tool:text="hgfhgfhgfhg hgfhgfhg ghfhgfhgf" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

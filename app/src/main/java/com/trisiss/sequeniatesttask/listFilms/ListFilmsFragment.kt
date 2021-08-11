@@ -51,24 +51,36 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
         }
 
+        binding.retry.setOnClickListener {
+            loadData()
+        }
+
         listFilmsAdapter.attachDelegate(object: OnClickItem {
             override fun filter(genre: GenreDto) {
                 Log.d("sdfd", "filter: ${genre.title}")
-                listFilmsAdapter.dataList.forEach { item ->
+                if (genre.activate) {
+                    genre.activate = false
+                    listFilmsAdapter.clearFilter()
+                    return
+                }
+                val tempList = arrayListOf<FilmListItem>()
+                listFilmsAdapter.allDataList.forEach { item ->
                     when (item) {
                         is GenreDto -> {
                             item.activate = item == genre
+                            tempList.add(item)
                         }
                         is FilmDto -> {
-                            item.visible = item.genres.contains(genre.title)
+                            if (item.genres.contains(genre.title)) tempList.add(item)
                         }
+                        else -> tempList.add(item)
                     }
                 }
-                listFilmsAdapter.notifyDataSetChanged()
+                listFilmsAdapter.setNewData(newData = tempList, full = false)
             }
 
             override fun openFilm(film: FilmDto) {
-                TODO("Not yet implemented")
+                ListFilmsFragmentDirections.actionListFilmsFragmentToDetailFilmFragment()
             }
         })
 
@@ -94,13 +106,18 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
             StateView.LOADING -> {
                 binding.progressCircular.visibility = View.VISIBLE
                 binding.recyclerListFilms.visibility = View.GONE
+                binding.textError.visibility = View.GONE
             }
             StateView.ERROR -> {
-
+                binding.progressCircular.visibility = View.GONE
+                binding.recyclerListFilms.visibility = View.GONE
+                binding.textError.text = presenter.error
+                binding.textError.visibility = View.VISIBLE
             }
             StateView.COMPLETE -> {
                 listFilmsAdapter.setNewData(newData = presenter.getFilmListUI())
                 binding.progressCircular.visibility = View.GONE
+                binding.textError.visibility = View.GONE
                 binding.recyclerListFilms.visibility = View.VISIBLE
             }
         }

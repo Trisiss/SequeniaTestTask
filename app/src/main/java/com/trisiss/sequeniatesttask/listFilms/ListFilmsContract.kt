@@ -12,6 +12,7 @@ import com.trisiss.sequeniatesttask.mvp.MvpView
  */
 interface ListFilmsContract {
     interface Presenter: MvpPresenter<View> {
+        var error: String
         fun load()
         fun loadFromState(state: Bundle)
         fun getFilmList(): ArrayList<FilmDto>

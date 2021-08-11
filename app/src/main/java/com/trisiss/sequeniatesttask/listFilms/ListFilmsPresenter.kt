@@ -4,10 +4,7 @@ import android.os.Bundle
 import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.FilmsService
 import com.trisiss.sequeniatesttask.data.model.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okio.IOException
 import retrofit2.Response
 
@@ -19,10 +16,15 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
     var view: ListFilmsContract.View? = null
     var listFilm: ArrayList<FilmDto> = arrayListOf<FilmDto>()
     var response: Response<FilmsDto>? = null
+    override var error: String = ""
+    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        error = throwable.localizedMessage ?: "Loading error"
+        view?.changeState(StateView.ERROR)
+    }
 
     override fun load() {
         view?.changeState(StateView.LOADING)
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             response = filmsService.load()
             withContext(Dispatchers.Main) {
                 if (response!!.isSuccessful) {

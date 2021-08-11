@@ -9,5 +9,14 @@
         android:id="@+id/listFilmsFragment"
         android:name="com.trisiss.sequeniatesttask.listFilms.ListFilmsFragment"
         android:label="fragment_list_films"
-        tools:layout="@layout/fragment_list_films" />
+        tools:layout="@layout/fragment_list_films" >
+        <action
+            android:id="@+id/action_listFilmsFragment_to_detailFilmFragment"
+            app:destination="@id/detailFilmFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFilmFragment"
+        android:name="com.trisiss.sequeniatesttask.detailFilm.DetailFilmFragment"
+        android:label="fragment_detail_film"
+        tools:layout="@layout/fragment_detail_film" />
 </navigation>

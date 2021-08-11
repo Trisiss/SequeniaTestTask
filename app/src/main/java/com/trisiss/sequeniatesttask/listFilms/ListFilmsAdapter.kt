@@ -1,7 +1,6 @@
 package com.trisiss.sequeniatesttask.listFilms
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.trisiss.sequeniatesttask.data.model.FilmDto
@@ -17,12 +16,23 @@ import com.trisiss.sequeniatesttask.loadImage
  * Created by trisiss on 8/7/2021.
  */
 class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    var allDataList = arrayListOf<FilmListItem>()
     var dataList = arrayListOf<FilmListItem>()
     private var delegate: OnClickItem? = null
 
-    fun setNewData(newData: ArrayList<FilmListItem>) {
+    fun setNewData(newData: ArrayList<FilmListItem>, full: Boolean = true) {
         dataList.clear()
         dataList.addAll(newData)
+        if (full) {
+            allDataList.clear()
+            allDataList.addAll(dataList)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun clearFilter() {
+        dataList.clear()
+        dataList.addAll(allDataList)
         notifyDataSetChanged()
     }
 
@@ -64,7 +74,6 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 previewImageview.setOnClickListener {
                     delegate?.openFilm(model)
                 }
-                itemView.visibility = if (model.visible) View.VISIBLE else View.GONE
             }
         }
 
@@ -77,7 +86,7 @@ class ListFilmsAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 genreButton.setOnClickListener {
                     delegate?.filter(model)
                 }
-                genreButton.isActivated = model.activate
+                genreButton.isPressed = model.activate
             }
         }
     }

@@ -5,7 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.trisiss.sequeniatesttask.R
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.trisiss.sequeniatesttask.databinding.FragmentDetailFilmBinding
+import com.trisiss.sequeniatesttask.loadImage
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,6 +25,8 @@ class DetailFilmFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private val args: DetailFilmFragmentArgs by navArgs()
+    lateinit var binding: FragmentDetailFilmBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -35,7 +40,22 @@ class DetailFilmFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail_film, container, false)
+        binding = FragmentDetailFilmBinding.inflate(inflater, container, false)
+
+        binding.toolbarFilmDetail.setOnClickListener {
+//            findNavController().navigateUp()
+            findNavController().popBackStack()
+        }
+
+        binding.imageFilm.loadImage(args.urlImage)
+        binding.titleFilm.text = args.title
+        binding.yearFilm.text = args.year.toString()
+        binding.ratingFilm.text = args.rating.toString()
+        binding.descriptionFilm.text = args.description
+
+        binding.toolbarFilmDetail.title = args.localizedTitle
+
+        return binding.root
     }
 
     companion object {

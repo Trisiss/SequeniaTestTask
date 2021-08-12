@@ -5,7 +5,6 @@ import com.trisiss.sequeniatesttask.StateView
 import com.trisiss.sequeniatesttask.data.FilmsService
 import com.trisiss.sequeniatesttask.data.model.*
 import kotlinx.coroutines.*
-import okio.IOException
 import retrofit2.Response
 
 /**
@@ -17,23 +16,23 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
     var listFilm: ArrayList<FilmDto> = arrayListOf<FilmDto>()
     var response: Response<FilmsDto>? = null
     override var error: String = ""
-    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         error = throwable.localizedMessage ?: "Loading error"
         view?.changeState(StateView.ERROR)
     }
 
+    // Загрузка списка фильмов
     override fun load() {
         view?.changeState(StateView.LOADING)
-        CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+        CoroutineScope(Dispatchers.IO + exceptionHandler).launch(exceptionHandler) {
             response = filmsService.load()
-            withContext(Dispatchers.Main) {
+            withContext(Dispatchers.Main + exceptionHandler) {
                 if (response!!.isSuccessful) {
-                    try {
-                        listFilm = ArrayList(response!!.body()?.films)
-                        view?.changeState(StateView.COMPLETE)
-                    } catch (e: IOException) {
-                        view?.changeState(StateView.ERROR)
-                    }
+                    listFilm = ArrayList(response!!.body()?.films)
+                    view?.changeState(StateView.COMPLETE)
+                } else {
+                    error = response?.message().toString()
+                    view?.changeState(StateView.ERROR)
                 }
             }
         }
@@ -47,6 +46,7 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
         view?.changeState(StateView.COMPLETE)
     }
 
+    // Подготовка списка для отображения в recyclerview
     override fun getFilmListUI(): ArrayList<FilmListItem> {
         val genres = getGenres(listFilm)
         val data = arrayListOf<FilmListItem>()
@@ -57,7 +57,7 @@ class ListFilmsPresenter(private val filmsService: FilmsService) : ListFilmsCont
         return data
     }
 
-
+    // Получить список жанров
     private fun getGenres(listFilm: ArrayList<FilmDto>): ArrayList<GenreDto> {
         val genres = arrayListOf<GenreDto>()
         val genresString = arrayListOf<String>()

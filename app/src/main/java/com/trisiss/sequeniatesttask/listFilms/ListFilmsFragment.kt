@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.trisiss.sequeniatesttask.StateView
@@ -51,11 +52,14 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
 
         }
 
+        // Повторная загрузка данных
         binding.retry.setOnClickListener {
             loadData()
         }
 
+        // Обработка нажатия
         listFilmsAdapter.attachDelegate(object: OnClickItem {
+            // Фильтр фильмов
             override fun filter(genre: GenreDto) {
                 Log.d("sdfd", "filter: ${genre.title}")
                 if (genre.activate) {
@@ -79,8 +83,17 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
                 listFilmsAdapter.setNewData(newData = tempList, full = false)
             }
 
+            // Переход на экран детальной информации о фильме
             override fun openFilm(film: FilmDto) {
-                ListFilmsFragmentDirections.actionListFilmsFragmentToDetailFilmFragment()
+                val action = ListFilmsFragmentDirections.actionListFilmsFragmentToDetailFilmFragment(
+                    urlImage = film.imageUrl,
+                    localizedTitle = film.localizedName,
+                    title = film.name,
+                    rating = film.rating ?: 0f,
+                    year = film.year,
+                    description = film.description
+                )
+                findNavController().navigate(action)
             }
         })
 
@@ -93,6 +106,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
         return binding.root
     }
 
+    // Загрузка данных их сохраненного состояния
     private fun loadDataFromState(state: Bundle) {
         presenter.loadFromState(state)
     }
@@ -101,6 +115,7 @@ class ListFilmsFragment : Fragment(), ListFilmsContract.View {
         presenter.load()
     }
 
+    // Состояние фрагмента
     override fun changeState(state: StateView) {
         when (state) {
             StateView.LOADING -> {

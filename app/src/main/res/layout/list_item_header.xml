@@ -11,8 +11,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="24sp"
+        android:textSize="@dimen/header_item_text_size"
         android:textAlignment="center"
-        android:background="#5C9D9B9F"/>
+        android:background="@color/header_item"
+        android:layout_margin="@dimen/default_margin"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

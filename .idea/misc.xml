@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Projects_dev/AndroidProjects/Sequeniatesttask/app/src/main/res/drawable/button_genre_background.xml" value="0.2755208333333333" />
         <entry key="..\:/Projects_dev/AndroidProjects/Sequeniatesttask/app/src/main/res/layout/activity_main.xml" value="0.15806159420289856" />
         <entry key="..\:/Projects_dev/AndroidProjects/Sequeniatesttask/app/src/main/res/layout/fragment_detail_film.xml" value="0.17617753623188406" />
         <entry key="..\:/Projects_dev/AndroidProjects/Sequeniatesttask/app/src/main/res/layout/fragment_list_films.xml" value="0.2" />

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.trisiss.sequeniatesttask.R
 import com.trisiss.sequeniatesttask.databinding.FragmentDetailFilmBinding
 import com.trisiss.sequeniatesttask.loadImage
 
@@ -49,8 +50,8 @@ class DetailFilmFragment : Fragment() {
 
         binding.imageFilm.loadImage(args.urlImage)
         binding.titleFilm.text = args.title
-        binding.yearFilm.text = args.year.toString()
-        binding.ratingFilm.text = args.rating.toString()
+        binding.yearFilm.text = getString(R.string.film_detail_year, args.year)
+        binding.ratingFilm.text = getString(R.string.film_detail_rating, args.rating)
         binding.descriptionFilm.text = args.description
 
         binding.toolbarFilmDetail.title = args.localizedTitle
